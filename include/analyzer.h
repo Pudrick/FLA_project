@@ -9,7 +9,7 @@ using std::string;
 class analyzer
 {
     public:
-    analyzer(std::string tm_name);
+    analyzer(string tm_name);
 
     private:
     string tm;
