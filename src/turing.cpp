@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     std::vector<string> arguments;
 
     // arguments analyzing
-    for(int i=0;i < argc;i++)
+    for(int i = 1;i < argc;i++)// if i start from 0, argv[0] will be "./turing"
     {
         string arg = argv[i];//although they are not the same type
         if(arg == "-h" || arg == "--help")
@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
         else 
             arguments.push_back(arg);
     }
+    std::cout << "construction begin" << std::endl;
     analyzer Ana(*arguments.begin());
     return 0; 
 }

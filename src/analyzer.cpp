@@ -12,12 +12,15 @@ analyzer::analyzer(string tm_name)
 {
     tm = tm_name;
     tm_file.open(tm_name);
-    if(!tm_file.is_open())
+    std::cout << "opening begins and tm_name is " << tm_name << std::endl;
+    if(tm_file.is_open() == false)
     {
-        std::cerr << "Can't open TM file." << std::endl;
+        std::cout << "Can't open TM file." << std::endl;
         std::exit(1);
     }
+    std::cout << "if has ended" << std::endl;
     tmFileAna(tm_file);
+    std::cout << "prepare to close" << std::endl;
     tm_file.close();
 }
 
