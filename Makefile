@@ -5,7 +5,7 @@ objects = analyzer.o simulator.o turing.o
 VPATH = src:include
 
 turing : $(objects)
-	gcc $(objects) -o turing
+	g++ $(objects) -o turing
 
 turing.o : analyzer.h simulator.h
 analyzer.o : analyzer.h
