@@ -26,5 +26,13 @@ analyzer::analyzer(string tm_name)
 
 void analyzer::tmFileAna(std::ifstream &filestream)
 {
-    std::cout << filestream.is_open() << std::endl;
+    if(filestream.fail())
+    {
+        std::cerr << "Can't read the TM file." << std::endl;
+        std::exit(2);
+    }
+    if(filestream.peek() == ';')
+    {
+        
+    }
 }
