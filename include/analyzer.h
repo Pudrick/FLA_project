@@ -9,7 +9,8 @@ using std::string;
 class analyzer
 {
     public:
-    analyzer(string tm_name);
+    analyzer(string tm_name, bool v_mode);
+    void set_verbose(bool value);
 
     private:
     string tm;
@@ -30,4 +31,5 @@ class analyzer
     }delta;
     void tmFileAna(std::ifstream &filestream);// Analyze the imput
     // std::ifstream as arguments need to be &.
+    bool VERBOSE_MODE = false;
 };
