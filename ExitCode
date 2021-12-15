@@ -1,2 +1,4 @@
 exit code 1: cant open the tm file
 exit code 2: cant read the tm file
+exit code 3: invalid input symbol
+exit code 4: invalid qflag
