@@ -19,7 +19,7 @@ class analyzer
     std::vector<string> S;
     std::vector<string> G;
     string q0;
-    const char boank = '_';
+    const char blank = '_';
     std::vector<string> F;
     int N;
     struct trans_func{
