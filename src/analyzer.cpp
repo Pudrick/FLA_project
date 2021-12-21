@@ -16,12 +16,12 @@ using std::string;
 
 #define IGNORE_WHOLE_LINE std::numeric_limits<std::streamsize>::max()
 
-void analyzer::set_verbose(bool value)
+void TM::set_verbose(bool value)
 {
     VERBOSE_MODE = value;
 }
 
-analyzer::analyzer(string tm_name, bool v_mode)
+TM::TM(string tm_name, bool v_mode)
 {
 
     set_verbose(v_mode);
@@ -33,13 +33,13 @@ analyzer::analyzer(string tm_name, bool v_mode)
         std::cerr << "Can't open TM file." << std::endl;
         std::exit(1);
     }
-    std::cout << "prepare to open tmfileana" << std::endl;
+    // std::cout << "prepare to open tmfileana" << std::endl;
     tmFileAna(tm_file);
-    std::cout << "prepare to close" << std::endl;
+    // std::cout << "prepare to close" << std::endl;
     tm_file.close();
 }
 
-void analyzer::tmFileAna(std::ifstream &filestream)
+void TM::tmFileAna(std::ifstream &filestream)
 {
     while(!filestream.eof())
     {
@@ -54,7 +54,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
         {
             // why the last empty line will get first == -1 ??
             // maybe -1 represent to eof.
-            std::cout << "get a comment with first " << int(first) << std::endl;
+            // std::cout << "get a comment with first " << int(first) << std::endl;
             filestream.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             continue;
         }
@@ -64,9 +64,9 @@ void analyzer::tmFileAna(std::ifstream &filestream)
         std::smatch flag;
         string line;
         std::getline(filestream,line);
-        std::cout << "string to regex is [" << line  << ']'<< std::endl;
+        // std::cout << "string to regex is [" << line  << ']'<< std::endl;
         std::regex_search(line, flag, head_regex);
-        std::cout << "get flag " << flag.str() << std::endl;
+        // std::cout << "get flag " << flag.str() << std::endl;
         // std::cout << "use regex will be "<< head.str() << '.' << std::endl;
         // continue;
 
@@ -128,11 +128,11 @@ void analyzer::tmFileAna(std::ifstream &filestream)
 
             std::smatch input_match;
             std::regex in_bracket("\\{(.*)\\}");
-            std::cout << "start regex search of input" << std::endl;
+            // std::cout << "start regex search of input" << std::endl;
             std::regex_search(line, input_match, in_bracket);
             input_set = input_match[1].str();
 
-            std::cout << "input set is " << input_set << std::endl;
+            // std::cout << "input set is " << input_set << std::endl;
             for(auto ch : input_set)
             {
                 if(ch == ',')
@@ -143,7 +143,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
                         std::cerr << "Invalid input symbol." << std::endl;
                         std::exit(3);
                     }
-                std::cout << "to append in S is " << ch << std::endl;
+                // std::cout << "to append in S is " << ch << std::endl;
                 S.push_back(ch);
             }
         }
@@ -164,7 +164,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
                         std::cerr << "Invalid input symbol." << std::endl;
                         std::exit(3);
                     }
-                std::cout << "to append in G is " << ch << std::endl;
+                // std::cout << "to append in G is " << ch << std::endl;
                 G.push_back(ch);
             }
         }
@@ -183,7 +183,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
             q0stream.ignore(IGNORE_WHOLE_LINE, '=');
             q0stream.ignore();// there is a ' ' after '='
             std::getline(q0stream, q0);
-            std::cout << "q0 is " << q0 << std::endl;
+            // std::cout << "q0 is " << q0 << std::endl;
         }
         if(flag.str() == "#B")
         {
@@ -191,7 +191,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
             Bstream.ignore(IGNORE_WHOLE_LINE,'=');
             Bstream.ignore();
             B = Bstream.get();
-            std::cout << "B is " << B << std::endl;
+            // std::cout << "B is " << B << std::endl;
         }
         if(flag.str() == "#N")
         {
@@ -201,7 +201,7 @@ void analyzer::tmFileAna(std::ifstream &filestream)
             string temp;
             std::getline(Nstream,temp);
             N = std::stoi(temp);
-            std::cout << "N is " << N << std::endl;
+            // std::cout << "N is " << N << std::endl;
         }
         if(first != '#')// means delta
         {
@@ -213,9 +213,9 @@ void analyzer::tmFileAna(std::ifstream &filestream)
             name_list = {"prev_state", "prev_symbols", "new_symbols", "directions", "new_state"};
             auto pos = 0;
             auto index = name_list.begin();
-            std::cout << "deltaset is " << delta_set << std::endl;
-            std::cout << "head of deltaset is " << (int)delta_set[0] << std::endl;
-            std::cout << "first is " << first << std::endl;
+            // std::cout << "deltaset is " << delta_set << std::endl;
+            // std::cout << "head of deltaset is " << (int)delta_set[0] << std::endl;
+            // std::cout << "first is " << first << std::endl;
             // for(;index != name_list.end();index++)
             //     std::cout << *index << " wooo" << std::endl;
             while((pos = delta_set.find(' '))  !=  string::npos)
@@ -223,16 +223,26 @@ void analyzer::tmFileAna(std::ifstream &filestream)
                 // (*element).push_back(state_set.substr(0, pos));
                 // delta[name_list[index]] = delta_set.substr(0, pos);
                 delta.insert({*index, delta_set.substr(0, pos)});
-                std::cout << "index is " << *index << std::endl;
-                std::cout << "val is " << delta_set.substr(0, pos) << std::endl;
+                // std::cout << "index is " << *index << std::endl;
+                // std::cout << "val is " << delta_set.substr(0, pos) << std::endl;
                 delta_set.erase(0,pos + 1);// 1 is length for ' '
                 index++;
             }// the last token don't have ',' so have to push it manually.
-            std::cout << "last index is " << *index << std::endl;
-            std::cout << "last www is " << delta_set.substr(0, pos) << std::endl;
+            // std::cout << "last index is " << *index << std::endl;
+            // std::cout << "last www is " << delta_set.substr(0, pos) << std::endl;
             delta.insert({*index, delta_set.substr(0, pos)});
             // for(auto str : delta)
             //     std::cout << "delta is " << str.second << std::endl;
         }
     }
+}
+
+std::vector<char> TM::getS()
+{
+    return S;
+}
+
+bool TM::get_verbose()
+{
+    return VERBOSE_MODE;
 }

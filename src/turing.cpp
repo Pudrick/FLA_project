@@ -3,6 +3,7 @@
 #include<string>
 
 #include"../include/analyzer.h"
+#include"../include/simulator.h"
 
 using std::string;
 
@@ -29,7 +30,10 @@ int main(int argc, char *argv[])
         else 
             arguments.push_back(arg);
     }
+    std::cout << "start and end is " << arguments[0] << "---" << arguments[1] << std::endl;
     std::cout << "construction begin" << std::endl;
-    analyzer Ana(*arguments.begin(), v_mode);
+    TM Ana(*arguments.begin(), v_mode);
+    std::cout << "analyze finished. start simulation." << std::endl;
+    simulate(Ana, arguments[1]);
     return 0; 
 }
