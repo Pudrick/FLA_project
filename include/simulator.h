@@ -17,3 +17,5 @@ using std::string;
 void simulate(class TM &machine, string input);
 
 void CheckInputValid(class TM &machine, string input);
+
+void SimulateRunning(class TM &machine, string input);

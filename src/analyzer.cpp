@@ -213,6 +213,7 @@ void TM::tmFileAna(std::ifstream &filestream)
             name_list = {"prev_state", "prev_symbols", "new_symbols", "directions", "new_state"};
             auto pos = 0;
             auto index = name_list.begin();
+            std::map<string, string> delta_item;
             // std::cout << "deltaset is " << delta_set << std::endl;
             // std::cout << "head of deltaset is " << (int)delta_set[0] << std::endl;
             // std::cout << "first is " << first << std::endl;
@@ -222,7 +223,7 @@ void TM::tmFileAna(std::ifstream &filestream)
             {
                 // (*element).push_back(state_set.substr(0, pos));
                 // delta[name_list[index]] = delta_set.substr(0, pos);
-                delta.insert({*index, delta_set.substr(0, pos)});
+                delta_item.insert({*index, delta_set.substr(0, pos)});
                 // std::cout << "index is " << *index << std::endl;
                 // std::cout << "val is " << delta_set.substr(0, pos) << std::endl;
                 delta_set.erase(0,pos + 1);// 1 is length for ' '
@@ -230,7 +231,8 @@ void TM::tmFileAna(std::ifstream &filestream)
             }// the last token don't have ',' so have to push it manually.
             // std::cout << "last index is " << *index << std::endl;
             // std::cout << "last www is " << delta_set.substr(0, pos) << std::endl;
-            delta.insert({*index, delta_set.substr(0, pos)});
+            delta_item.insert({*index, delta_set.substr(0, pos)});
+            delta.push_back(delta_item);
             // for(auto str : delta)
             //     std::cout << "delta is " << str.second << std::endl;
         }
@@ -245,4 +247,24 @@ std::vector<char> TM::getS()
 bool TM::get_verbose()
 {
     return VERBOSE_MODE;
+}
+
+void TM::set_state(string state)
+{
+    CurrentState = state;
+}
+
+string TM::get_state()
+{
+    return CurrentState;
+}
+
+std::vector<std::map<string, string>> TM::get_delta()
+{
+    return delta;
+}
+
+std::vector<string> TM::get_final()
+{
+    return F;
 }

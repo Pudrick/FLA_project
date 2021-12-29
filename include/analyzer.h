@@ -16,6 +16,10 @@ class TM
         string get_tm();
         bool get_verbose();
         std::vector<char> getS();
+        void set_state(string state);
+        string get_state();
+        std::vector<std::map<string, string>> get_delta();
+        std::vector<string> get_final();
 
     private:
         string tm;
@@ -24,6 +28,7 @@ class TM
         std::vector<char> S;
         std::vector<char> G;
         string q0;
+        string CurrentState = q0;
         char B = '_';
         std::vector<string> F;
         int N;
@@ -37,7 +42,7 @@ class TM
         //     string directions;
         // }delta;
 
-        std::map<string, string> delta;
+        std::vector<std::map<string, string>> delta;
 
         void tmFileAna(std::ifstream &filestream);// Analyze the imput
         // std::ifstream as arguments need to be &.
