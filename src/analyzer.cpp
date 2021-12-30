@@ -35,6 +35,7 @@ TM::TM(string tm_name, bool v_mode)
     }
     // std::cout << "prepare to open tmfileana" << std::endl;
     tmFileAna(tm_file);
+    CurrentState = q0;
     // std::cout << "prepare to close" << std::endl;
     tm_file.close();
 }
@@ -49,6 +50,7 @@ void TM::tmFileAna(std::ifstream &filestream)
             std::exit(2);
         }
         char first = filestream.peek();
+        // std::cout << "first is " << first << std::endl;
         // std::cout << "first is " << int(first) << std::endl;
         if(first == ';' || first == 10 || first == 0 || first == -1)// ASCII 10 is '\n'.
         {
@@ -63,7 +65,9 @@ void TM::tmFileAna(std::ifstream &filestream)
         std::regex head_regex("[^ ]*");// get string before " "
         std::smatch flag;
         string line;
+        
         std::getline(filestream,line);
+        // std::cout << "line is " << line << std::endl;
         // std::cout << "string to regex is [" << line  << ']'<< std::endl;
         std::regex_search(line, flag, head_regex);
         // std::cout << "get flag " << flag.str() << std::endl;
@@ -79,6 +83,7 @@ void TM::tmFileAna(std::ifstream &filestream)
         //     string flag = flag_temp;
         if(flag.str() == "#Q" || flag.str() == "#F")
         {
+            // std::cout << "Add Q of F begin" << std::endl;
             // std::unique_ptr<std::vector<string>> element;
             std::vector<string> *element;
             if(flag.str() == "#Q")
@@ -118,9 +123,11 @@ void TM::tmFileAna(std::ifstream &filestream)
                 // std::cout << "final Q or F is " << str << std::endl;
             }
                 // std::cout << "token is " << i << std::endl;
+            // std::cout << "Add Q or F finished." << std::endl;
         }
         if(flag.str() == "#S")
         {
+            // std::cout << "Add S begin." << std::endl;
             std::vector<char> S_ban_list = {' ', ',', ';', '{', '}', '*', '_'};
             // filestream.ignore(std::numeric_limits<std::streamsize>::max(),'{');
             string input_set;
@@ -146,14 +153,20 @@ void TM::tmFileAna(std::ifstream &filestream)
                 // std::cout << "to append in S is " << ch << std::endl;
                 S.push_back(ch);
             }
+            // std::cout << "Add S finished." << std::endl;
         }
         if(flag.str() == "#G")
         {
+            // std::cout << "Add G begin." << std::endl;
+            // std::cout << "G line is " << line << std::endl;
             std::vector<char> G_ban_list = {' ', ',', ';', '{', '}', '*'};
-            filestream.ignore(std::numeric_limits<std::streamsize>::max(),'{');
+            // filestream.ignore(std::numeric_limits<std::streamsize>::max(),'{');
+            line.erase(0,6);
+            line.pop_back();
             string tape_set;
-            std::getline(filestream, tape_set, '}');
-            std::cout << "tape set is " << tape_set << std::endl;
+            // std::getline(filestream, tape_set, '}');
+            tape_set = line;
+            // std::cout << "tape set in G is " << tape_set << std::endl;
             for(auto ch : tape_set)
             {
                 if(ch == ',')
@@ -167,9 +180,11 @@ void TM::tmFileAna(std::ifstream &filestream)
                 // std::cout << "to append in G is " << ch << std::endl;
                 G.push_back(ch);
             }
+            // std::cout << "Add G finished." << std::endl;
         }
         if(flag.str() == "#q0")
         {
+            // std::cout << "Add q0 begin." << std::endl;
             // char q_flag;
             // filestream.get(&q_flag,2);
             // std::cout << "qflag is " << q_flag << std::endl;
@@ -184,17 +199,21 @@ void TM::tmFileAna(std::ifstream &filestream)
             q0stream.ignore();// there is a ' ' after '='
             std::getline(q0stream, q0);
             // std::cout << "q0 is " << q0 << std::endl;
+            // std::cout << "Add q0 finished." << std::endl;
         }
         if(flag.str() == "#B")
         {
+            // std::cout << "Add B begin." << std::endl;
             std::stringstream Bstream(line);
             Bstream.ignore(IGNORE_WHOLE_LINE,'=');
             Bstream.ignore();
             B = Bstream.get();
             // std::cout << "B is " << B << std::endl;
+            // std::cout << "Add B finished." << std::endl;
         }
         if(flag.str() == "#N")
         {
+            // std::cout << "Add N begin." << std::endl;
             std::stringstream Nstream(line);
             Nstream.ignore(IGNORE_WHOLE_LINE, '=');
             Nstream.ignore();// there is a ' ' after '='
@@ -202,9 +221,11 @@ void TM::tmFileAna(std::ifstream &filestream)
             std::getline(Nstream,temp);
             N = std::stoi(temp);
             // std::cout << "N is " << N << std::endl;
+            // std::cout << "Add N finished." << std::endl;
         }
         if(first != '#')// means delta
         {
+            // std::cout << "Add delta begin." << std::endl;
             // std::regex head_regex("[^ ]*");
             string delta_set = line;
             // std::getline(filestream, delta_set);
@@ -219,22 +240,29 @@ void TM::tmFileAna(std::ifstream &filestream)
             // std::cout << "first is " << first << std::endl;
             // for(;index != name_list.end();index++)
             //     std::cout << *index << " wooo" << std::endl;
+            // std::cout << "start loop\n";
             while((pos = delta_set.find(' '))  !=  string::npos)
             {
                 // (*element).push_back(state_set.substr(0, pos));
                 // delta[name_list[index]] = delta_set.substr(0, pos);
+                // std::cout << "start insert.\n";
+                // std::cout << "to insert is " << *index << " and " << delta_set.substr(0, pos) << std::endl;
                 delta_item.insert({*index, delta_set.substr(0, pos)});
+                // std::cout << "insert success.\n";
                 // std::cout << "index is " << *index << std::endl;
                 // std::cout << "val is " << delta_set.substr(0, pos) << std::endl;
                 delta_set.erase(0,pos + 1);// 1 is length for ' '
+                // std::cout << "erase successed.\n";
                 index++;
             }// the last token don't have ',' so have to push it manually.
+            std::cout << "loop end.\n";
             // std::cout << "last index is " << *index << std::endl;
             // std::cout << "last www is " << delta_set.substr(0, pos) << std::endl;
             delta_item.insert({*index, delta_set.substr(0, pos)});
             delta.push_back(delta_item);
             // for(auto str : delta)
             //     std::cout << "delta is " << str.second << std::endl;
+            // std::cout << "Add delta finished." << std::endl;
         }
     }
 }

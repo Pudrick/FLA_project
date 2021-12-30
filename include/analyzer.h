@@ -28,7 +28,7 @@ class TM
         std::vector<char> S;
         std::vector<char> G;
         string q0;
-        string CurrentState = q0;
+        string CurrentState;
         char B = '_';
         std::vector<string> F;
         int N;

@@ -9,10 +9,11 @@ using std::string;
 
 bool InString(char ch, string str);
 void display_v();
+bool check_end(string state_now, std::vector<string> end_state);
 
 void simulate(class TM &machine, string input)
 {
-    std::cout << "start to simulate" << std::endl;
+    // std::cout << "start to simulate" << std::endl;
     CheckInputValid(machine, input);    
     SimulateRunning(machine, input);
 }
@@ -21,7 +22,7 @@ void CheckInputValid(class TM &machine, string input)
 {
     string validS;
     std::cout << "Input: " << input << std::endl;
-    std::cout << "valid chs is ";
+    // std::cout << "valid chs is ";
     for(auto ch : machine.getS())
     {
         std::cout << ch;
@@ -34,7 +35,7 @@ void CheckInputValid(class TM &machine, string input)
     // char Errch = 0;
     for(auto ch : input)
     {
-        std::cout << "ch and input is " << ch << "-----" << input << std::endl;
+        // std::cout << "ch and input is " << ch << "-----" << input << std::endl;
         if(InString(ch, validS) == false)
             if(machine.get_verbose() == true)
             {
@@ -67,9 +68,10 @@ bool InString(char ch, string str)
 void SimulateRunning(class TM &machine, string input)
 {
     
-    std::cout << "start simulate running" << std::endl;
+    // std::cout << "start simulate running" << std::endl;
     std::vector<string> final_states = machine.get_final();
     string state_now = machine.get_state();
+    // std::cout << "get state is " << state_now << std::endl;
     int step = 0;
     int numOfTapes = 0;
     std::vector<int> head_pos;
@@ -79,14 +81,24 @@ void SimulateRunning(class TM &machine, string input)
     for(int i=0;i<numOfTapes;i++)
         head_pos.push_back(0);
     std::vector<string> tapes;
-    tapes.push_back(input);
+    string input_temp = input;
+    input_temp.append("______________________________________");
+    tapes.push_back(input_temp);
     for(int i=1;i<numOfTapes;i++)
-        tapes.push_back("_");
+        tapes.push_back("_________________________________________");
 
     // std::cout << "numof is " << numOfTapes << std::endl;
-    while(std::find(final_states.begin(),final_states.end(),state_now) == final_states.end())
+
+    // std::cout << "big while start." << std::endl;
+    while(!check_end(state_now, final_states))
     {
+        // std::cout << "enter while loop" << std::endl;
+        static int stop = 0;
+        if(stop >= 30)
+            std::exit(0);
+        stop++;
         //current state is not at Final state
+        // std::cout << "enter verbose loop" << std::endl;
         if(machine.get_verbose() == true)
         {
             std::cout << "Step   : " << step << std::endl;
@@ -107,19 +119,21 @@ void SimulateRunning(class TM &machine, string input)
                     index_str.append(" ");
                     i_ch++;
                 }
+                std::cout << "i_Ch = " << i_ch << std::endl;
 
                 std::cout << "Index" << i_tape << " : " << index_str << std::endl;
 
                 string tape_str;
                 for(int i_temp = i_ch;i_temp < len;i_temp++)
                 {
+                    // std::cout << std::to_string(tapes[i_tape][i_temp]) << " will be add to tape string" << std::endl;
                     tape_str.append(std::to_string(tapes[i_tape][i_temp]));
                     if(i_temp < 10)
                         tape_str.append(" ");
                     else
                         tape_str.append("  ");
                 }
-                std::cout << "Tape" << i_tape << " : " << tape_str << std::endl;
+                std::cout << "Tape" << i_tape << "  : " << tape_str << std::endl;
 
                 int arrow_pos = index_str.find(head_pos[i_tape]);
                 std::cout << "Head" << i_tape << "  : ";
@@ -138,6 +152,7 @@ void SimulateRunning(class TM &machine, string input)
             std::cout << "State  : " << state_now;
         }//display in verbose
 
+        // std::cout << "finished verbose loop\n";
         for(auto delta : delta_vector)
         {
             // delta is ："<旧状态> <旧符号组> <新符号组> <⽅向组> <新状态>
@@ -147,32 +162,72 @@ void SimulateRunning(class TM &machine, string input)
             // } else {
             //     /* v does not contain x */
             // }
-            bool check_state = delta.find("prev_state")->second == state_now;
+            // std::cout << "for loop begins\n";
+            int stop=0;
+            if(stop >= 10)
+                std::exit(0);
+            stop++;
+            // std::cout << "mark state now is " << state_now << std::endl;
+            // std::exit(0);
+            // std::cout << "mark find state and real state is " << delta.find("prev_state")->second << " and " << state_now << std::endl;
+            bool check_state = (delta.find("prev_state")->second == state_now);
+            if(!check_state)
+                continue;
             bool check_symbol = true;
             string prev_symbols = delta.find("prev_symbols")->second;
             for(int i=0;i<numOfTapes;i++)
             {
-                if(tapes[i][head_pos[i]] == prev_symbols[i])
+                // std::cout << "mark read is " << tapes[i][head_pos[i]] << " and its int is " << int(tapes[i][head_pos[i]]) << " and prevsym is " << prev_symbols[i] << std::endl;
+                if((tapes[i][head_pos[i]] == prev_symbols[i]) || prev_symbols[i] == '*' || tapes[i][head_pos[i]] == '*')
+                {
                     check_symbol = check_symbol && true;
+                    continue;
+                }
+                if((tapes[i][head_pos[i]] == 0 && prev_symbols[i] == '_') || (tapes[i][head_pos[i]] == '_' && prev_symbols[i] == 0))
+                {
+                    check_symbol = check_symbol && true;
+                    continue;
+                }
                 else
                     check_symbol = check_symbol && false;
             }
+            // std::cout << "mark check_state and check_symbol is "<< check_state << " " << check_symbol << std::endl;
             if(check_state && check_symbol)
             {
+                // std::cout << "both check is true" << std::endl;
                 string new_symbols = delta.find("new_symbols")->second;
                 string directions = delta.find("directions")->second;
                 for(int i=0;i<numOfTapes;i++)
                 {
-                    tapes[i][head_pos[i]] = new_symbols[i];
+                    // std::cout << new_symbols[i] << " will in tape " << i << std::endl;
+                    // std::cout << "dir is " << directions[i] << std::endl;
+                    if(new_symbols[i] != '*')
+                        tapes[i][head_pos[i]] = new_symbols[i];
                     if(directions[i] == 'r')
                         head_pos[i]++;
                     else if(directions[i] == 'l')
                         head_pos[i]--;
+                    // std::cout << "tape " << i << " is " << tapes[i] << std::endl;
+                    // std::cout << "ptr in tape " << i << " is " << tapes[i][head_pos[i]] << std::endl;
                 }
+                // std::cout << "mark state will set as " << delta.find("new_state")->second << std::endl;
                 machine.set_state(delta.find("new_state")->second);
                 break;
             }
         }
+        state_now = machine.get_state();
     }
     //TODO:return result
+    // just a raw edition, need to edit
+    tapes[0].erase(std::remove(tapes[0].begin(), tapes[0].end(), '_'), tapes[0].end());
+    std::cout << "Result: " << tapes[0] << std::endl;
+    std::cout << "==================== END ====================" << std::endl;
+}
+
+bool check_end(string state_now, std::vector<string> end_list)
+{
+    for(auto item : end_list)
+        if(item == state_now)
+            return true;
+    return false;
 }
