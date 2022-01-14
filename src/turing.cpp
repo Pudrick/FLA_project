@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 {
     std::vector<string> arguments;
     bool v_mode = false;
-    std::cout << "launched." << std::endl;
+    // std::cout << "launched." << std::endl;
     // arguments analyzing
     for(int i = 1;i < argc;i++)// if i start from 0, argv[0] will be "./turing"
     {
@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
             arguments.push_back(arg);
     }
     // std::cout << "start and end is " << arguments[0] << "---" << arguments[1] << std::endl;
-    std::cout << "construction begin" << std::endl;
+    // std::cout << "construction begin" << std::endl;
     TM Ana(*arguments.begin(), v_mode);
-    std::cout << "analyze finished. start simulation." << std::endl;
+    // std::cout << "analyze finished. start simulation." << std::endl;
     simulate(Ana, arguments[1]);
     return 0; 
 }

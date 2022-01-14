@@ -147,7 +147,7 @@ void TM::tmFileAna(std::ifstream &filestream)
                 for(auto check : S_ban_list)
                     if(ch == check)
                     {
-                        std::cerr << "Invalid input symbol." << std::endl;
+                        std::cerr << ch << "is invalid input symbol." << std::endl;
                         std::exit(3);
                     }
                 // std::cout << "to append in S is " << ch << std::endl;
@@ -162,7 +162,9 @@ void TM::tmFileAna(std::ifstream &filestream)
             std::vector<char> G_ban_list = {' ', ',', ';', '{', '}', '*'};
             // filestream.ignore(std::numeric_limits<std::streamsize>::max(),'{');
             line.erase(0,6);
+            // std::cout << "line is |**" << line << "**|" << std::endl;
             line.pop_back();
+            // std::cout << "line is |" << line << "|" << std::endl;
             string tape_set;
             // std::getline(filestream, tape_set, '}');
             tape_set = line;
@@ -255,7 +257,7 @@ void TM::tmFileAna(std::ifstream &filestream)
                 // std::cout << "erase successed.\n";
                 index++;
             }// the last token don't have ',' so have to push it manually.
-            std::cout << "loop end.\n";
+            // std::cout << "loop end.\n";
             // std::cout << "last index is " << *index << std::endl;
             // std::cout << "last www is " << delta_set.substr(0, pos) << std::endl;
             delta_item.insert({*index, delta_set.substr(0, pos)});
